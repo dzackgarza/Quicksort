@@ -1,9 +1,14 @@
 # depslib dependency file v1.0
-1381972305 source:/home/zack/Quicksort1/Main.cpp
+1382324999 source:/home/zack/Quicksort1/Main.cpp
 	"Quicksort1.h"
 	<cstdlib>
 	<iostream>
+	<time.h>
 
-1381972281 /home/zack/Quicksort1/Quicksort1.h
+1382325873 /home/zack/Quicksort1/Quicksort1.h
 	<cstdlib>
+
+1382325948 source:/home/zack/Quicksort1/Quicksort1.cpp
+	"Quicksort1.h"
+	<iostream>
 
