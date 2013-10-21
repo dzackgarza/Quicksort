@@ -2,7 +2,7 @@
 
     Zack Garza
     CISP 430 - TTH 5:30 pm
-    Programming Project 4 - Recursive Sorting
+    Programming Project 4 - Recursive Sorting / Quicksort
     24 October 2013
 
 *****************************************************/
@@ -19,14 +19,13 @@ void Quicksort( ItemType* first_elem, size_t num_elem,
     unsigned pivot = Partition(first_elem, num_elem, fcmp);
 
     Quicksort(first_elem, pivot, fcmp);
-    Quicksort(first_elem + pivot + 1, num_elem-pivot-1, fcmp);
+    Quicksort( (first_elem + pivot + 1), (num_elem - pivot - 1), fcmp);
 }
 
 unsigned Partition(ItemType* it, size_t nelem,
                    int (*fcmp)(const ItemType&, const ItemType&) )
 {
-    unsigned pivot = 0;
-    unsigned oe = (nelem - 1);
+    unsigned pivot = 0, oe = (nelem - 1);
 
     while (pivot != oe)
     {
@@ -45,18 +44,11 @@ void MoveIndex(unsigned& pivot, unsigned& oe)
     if (pivot < oe) oe--; else oe++;
 }
 
-bool OutOfOrder (ItemType* it, unsigned pivot, unsigned oe,
+bool OutOfOrder(ItemType* it, unsigned pivot, unsigned oe,
                   int (*fcmp)(const ItemType&, const ItemType&) )
 {
     return (pivot > oe && fcmp(it[pivot], it[oe]) > 0 ||
             pivot < oe && fcmp(it[oe], it[pivot]) > 0 );
-}
-
-int fcmp(ItemType& i1, ItemType& i2)
-{
-    if (i1 > i2) return 1;
-    else if (i1 < i2) return -1;
-    else return 0;
 }
 
 void SwapItem(ItemType* it, unsigned& i1, unsigned& i2)
