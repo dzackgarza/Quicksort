@@ -94,14 +94,18 @@ void Quicksort2( void* first_elem, size_t num_elem, size_t width,
 void* Partition( void* it, size_t num_elems, size_t width,
                    int (*fcmp)(const void*, const void*) )
 {
+    std::cout << "Partitioning. Pivot is " << *(int*)it << endl;
     void* pivot = it;
     void* oe = it + (width * (num_elems - 1));
     bool pivot_first = true;
 
     while (pivot != oe) // While pointers do not contain the same addresses - i.e., they do not point to the same thing.
     {
+        cout << "Pivot and OE not equal. Pivot = " << *(ItemType*)pivot << " and oe = " << *(ItemType*)oe << endl;
         if (OutOfOrder(pivot, oe, pivot_first, fcmp))
         {
+            cout << "Pivot and OE out of order." << endl;
+            std::cout << "Swapping.." << std::endl;
             // Swap values
             SwapItem(pivot, oe, width);
             // Swap pointers
@@ -110,6 +114,7 @@ void* Partition( void* it, size_t num_elems, size_t width,
             pivot_first = !pivot_first;
         }
         // Move OE toward Pivot
+        cout << "Moving oe toward pivot.\n" << endl;
         MoveIndex(it, oe, width, pivot_first, num_elems);
     }
     return pivot;
