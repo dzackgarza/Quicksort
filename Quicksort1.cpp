@@ -46,13 +46,13 @@ void Quicksort2( void* first_elem, size_t num_elem, size_t width,
     void* temp_pivot = Partition(first_elem, num_elem, width, fcmp);
     // Pivot is now in its final position, so sort each remaining half.
 
-    char* item = static_cast<char*>(first_elem);
+    char* first_item = static_cast<char*>(first_elem);
     char* pivot = static_cast<char*>(temp_pivot);
-    char* last_item = static_cast<char*>(item + (num_elem * width));
+    char* last_item = static_cast<char*>(first_item + (num_elem * width));
 
     // pivot - item = number of bytes between the pointers. Scale by width
     // to get number of elements.
-    unsigned num_LHS_elems = (pivot - item) / width;
+    unsigned num_LHS_elems = (pivot - first_item) / width;
     unsigned num_RHS_elems = (last_item - pivot - 1) / width;
 
     // Should be the first element after the pivot.
@@ -73,7 +73,7 @@ static void* Partition( void* it, size_t num_elems, size_t width,
     // Choose the first item as the pivot.
     void* pivot = it;
     // The last item is the "other end".
-    void* oe = it + (width * (num_elems - 1));
+    void* oe = (char*)it + (width * (num_elems - 1));
     // Keep track of the pivot's relative position to oe.
     bool pivot_first = true;
 
@@ -100,8 +100,8 @@ static bool OutOfOrder(void* p, void* other_end, bool pivot_first,
                   int (*fcmp)(const void*, const void*) )
 {
     int cmp = fcmp(p, other_end);
-    return ( pivot_first && cmp > 0 ||
-             !pivot_first && cmp < 0 );
+    return ( (pivot_first && cmp > 0) ||
+             (!pivot_first && cmp < 0) );
 }
 
 // Move OE toward Pivot.
