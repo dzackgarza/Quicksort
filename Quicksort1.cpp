@@ -15,19 +15,27 @@ using namespace std;
 
 //  Function Prototypes
 //  -----------------------------------------------------
-void* Partition(void* it, size_t nelem, size_t width,
+
+// Chooses the first item in the subset as a pivot point.
+// Moves the pivot into its final position, with values less
+// than it moved to the left and values greater to the right.
+static void* Partition(void* it, size_t nelem, size_t width,
                    int (*fcmp)(const void*, const void*) );
 
-void SwapIndex(void* &i1, void* &i2);
-
-void SwapItem(void* &i1, void* &i2, size_t);
-
-void ptrswap(int** a, int** b);
-
-void MoveIndex(void* it, void* &oe, size_t width, bool, size_t);
-
-bool OutOfOrder(void* p, void* other_end, bool pivot_first,
+// Returns true if the pivot's position is before OE AND pivot's value is less than OE's.
+// Has the effect of moving all values less than pivot to the left and
+// values greater than pivot to the right.
+static bool OutOfOrder(void* p, void* other_end, bool pivot_first,
                   int (*fcmp)(const void*, const void*) );
+
+// Swaps what two pointers point to.
+static void SwapIndex(void* &i1, void* &i2);
+
+// Swaps the values bit by bit at two addresses.
+static void SwapItem(void* &i1, void* &i2, size_t);
+
+// Moves to OE pointer toward the pivot pointer.
+static void MoveIndex(void* it, void* &oe, size_t width, bool, size_t);
 //  -----------------------------------------------------
 
 void Quicksort2( void* first_elem, size_t num_elem, size_t width,
@@ -36,70 +44,43 @@ void Quicksort2( void* first_elem, size_t num_elem, size_t width,
     if (num_elem <= 1) return;
 
     void* temp_pivot = Partition(first_elem, num_elem, width, fcmp);
+    // Pivot is now in its final position, so sort each remaining half.
+
     char* item = static_cast<char*>(first_elem);
     char* pivot = static_cast<char*>(temp_pivot);
     char* last_item = static_cast<char*>(item + (num_elem * width));
-    char* temp = item;
-    cout << endl;
-    while (temp != last_item)
-    {
-        cout << *(ItemType*)temp;
-        if (temp == pivot) cout << " (Pivot) ";
-        cout << "|";
-        temp += width;
-    }
-    cout << endl;
-    int LHS_elems = ( pivot - item ) / width;
-    std::cout << "\nNumber of LHS elements: " << LHS_elems << std::endl;
 
-    int RHS_elems = (last_item - pivot - 1) / width;
-    std::cout << "\nNumber of RHS elements: " << RHS_elems << std::endl;
+    // pivot - item = number of bytes between the pointers. Scale by width
+    // to get number of elements.
+    unsigned num_LHS_elems = (pivot - item) / width;
+    unsigned num_RHS_elems = (last_item - pivot - 1) / width;
 
+    // Should be the first element after the pivot.
+    void* RHS_first_element = (char*)first_elem + (num_LHS_elems * width) + width;
 
-    if (LHS_elems != 0)
-    {
-        cout << "Sorting LHS" << endl;
-        Quicksort2( first_elem, LHS_elems, width, fcmp );
-    }
-    temp = item;
-    cout << "After Sorting LHS: ";
-    while (temp != last_item)
-    {
-        cout << *(ItemType*)temp;
-        if (temp == pivot) cout << " (Pivot) ";
-        cout << "|";
-        temp += width;
-    }
-    cout << endl;
+    // From first element to element at (pivot - 1).
+    if (num_LHS_elems != 0)
+        Quicksort2( first_elem, num_LHS_elems, width, fcmp );
 
-    if (RHS_elems != 0)
-    {
-        cout << "Sorting RHS" << endl;
-        Quicksort2( (char*)first_elem + (LHS_elems*width) + width, RHS_elems, width, fcmp );
-    }
-    temp = item;
-    cout << "After Sorting RHS: ";
-    while (temp != last_item)
-    {
-        cout << *(ItemType*)temp;
-        if (temp == pivot) cout << " (Pivot) ";
-        cout << "|";
-        temp += width;
-    }
-    cout << endl;
-
-    std::cout << "Done." << std::endl;
+    // From element at (pivot + 1) to last.
+    if (num_RHS_elems != 0)
+        Quicksort2( RHS_first_element, num_RHS_elems, width, fcmp );
 }
 
-void* Partition( void* it, size_t num_elems, size_t width,
+static void* Partition( void* it, size_t num_elems, size_t width,
                    int (*fcmp)(const void*, const void*) )
 {
+    // Choose the first item as the pivot.
     void* pivot = it;
+    // The last item is the "other end".
     void* oe = it + (width * (num_elems - 1));
+    // Keep track of the pivot's relative position to oe.
     bool pivot_first = true;
 
     while (pivot != oe) // While pointers do not contain the same addresses - i.e., they do not point to the same thing.
     {
+        // Only move things if the pivot is on the left and its value is greater than oe,
+        // or if pivot is on the right and its value is less than oe.
         if (OutOfOrder(pivot, oe, pivot_first, fcmp))
         {
             // Swap values
@@ -115,7 +96,7 @@ void* Partition( void* it, size_t num_elems, size_t width,
     return pivot;
 }
 
-bool OutOfOrder(void* p, void* other_end, bool pivot_first,
+static bool OutOfOrder(void* p, void* other_end, bool pivot_first,
                   int (*fcmp)(const void*, const void*) )
 {
     int cmp = fcmp(p, other_end);
@@ -123,10 +104,11 @@ bool OutOfOrder(void* p, void* other_end, bool pivot_first,
              !pivot_first && cmp < 0 );
 }
 
-void MoveIndex(void* i1, void* &o1, size_t width, bool pivot_first, size_t num_elems)
+// Move OE toward Pivot.
+static void MoveIndex(void* item, void* &other_end, size_t width, bool pivot_first, size_t num_elems)
 {
-    char* it = static_cast<char*>(i1);
-    char* oe = static_cast<char*>(o1);
+    char* it = static_cast<char*>(item);
+    char* oe = static_cast<char*>(other_end);
 
     if (pivot_first)
     {
@@ -138,59 +120,33 @@ void MoveIndex(void* i1, void* &o1, size_t width, bool pivot_first, size_t num_e
         if ( oe + width <= it + width*(num_elems-1) ) // Or beyond the last element. Somehow.
             oe = oe + width;
     }
-    i1 = it;
-    o1 = oe;
+    item = it;
+    other_end = oe;
 }
 
-void SwapIndex(void* &i1, void* &i2)
+// Swap two pointers.
+static void SwapIndex(void* &i1, void* &i2)
 {
     void* temp = i1;
     i1 = i2;
     i2 = temp;
 }
 
-void SwapItem(void* &item_1, void* &item_2, size_t width)
+// Swap the contents of two pointers byte by byte.
+static void SwapItem(void* &item_1, void* &item_2, size_t width)
 {
+    // Cast to temp char* variables to read one byte at a time.
     char* i1 = static_cast<char*>(item_1);
     char* i2 = static_cast<char*>(item_2);
 
+    // Walk through i bytes (the size of the item) and swap memory contents.
     for (unsigned i=0; i < width - 1; i++)
     {
      char temp = i1[i];
      i1[i] = i2[i];
      i2[i] = temp;
     }
+    // Write swapped values back to original memory locations.
     item_1 = i1;
     item_2 = i2;
 }
-
-//////////////
-/*void Quicksort( ItemType* first_elem, size_t num_elem,
-                int (*fcmp)(const ItemType&, const ItemType&) )
-{
-    if (num_elem <= 1) return;
-
-    unsigned pivot = Partition(first_elem, num_elem, fcmp);
-
-    Quicksort(first_elem, pivot, fcmp);
-    Quicksort( (first_elem + pivot + 1), (num_elem - pivot - 1), fcmp);
-}
-
-unsigned Partition(ItemType* it, size_t nelem,
-                   int (*fcmp)(const ItemType&, const ItemType&) )
-{
-    unsigned pivot = 0, oe = (nelem - 1);
-
-    while (pivot != oe)
-    {
-        if (OutOfOrder(it, pivot, oe, fcmp))
-        {
-            SwapItem(it, pivot, oe);    // Swap values
-            SwapIndex(oe, pivot);       // Swap pointers/indices
-        }
-        MoveIndex(pivot, oe);           // Move OE toward Pivot
-    }
-    return pivot;
-}
-
-*/

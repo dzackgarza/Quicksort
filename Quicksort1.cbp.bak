@@ -31,7 +31,6 @@
 		<Compiler>
 			<Add option="-Wall" />
 		</Compiler>
-		<Unit filename="DEFtime.h" />
 		<Unit filename="Main.cpp" />
 		<Unit filename="Quicksort1.cpp" />
 		<Unit filename="Quicksort1.h" />

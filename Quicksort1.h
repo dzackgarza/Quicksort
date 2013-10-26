@@ -9,7 +9,7 @@
 
 #ifndef QUICK_SORT_H
 #define QUICK_SORT_H
-#define ItemType std::string
+#define ItemType int
 #include <cstdlib>
 void Quicksort2( void* base, size_t nelem, size_t width,
                 int (*fcmp)( const void*, const void* ) );

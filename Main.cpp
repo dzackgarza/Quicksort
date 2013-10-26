@@ -8,10 +8,12 @@
 *****************************************************/
 
 #include "Quicksort1.h"
-#include <cstdlib>
 #include <iostream>
 #include <time.h>
-#define elems 100
+#include <sys/timeb.h>
+
+#define elems 10000
+#define trials 10
 using namespace std;
 
 //  Function Prototypes
@@ -27,29 +29,51 @@ void test_ooo2(void*, void* &b, void* &c, unsigned, int);
 bool ooo(void* p, void* other_end, bool pivot_first,
                   int (*fcmp)(const void*, const void*) );
 double fRand(double fMin, double fMax);
-std::string random_string( size_t length );
+string random_string( size_t length );
+double iRand(int fMin, int fMax);
+double TIME();
+static ItemType array[elems];
 //  -----------------------------------------------------
 
 int main()
 {
-    ItemType array[elems];
     srand (time(NULL));
+    double TimeInit, TimeFinal, qs_Time_Total = 0, custom_qs_Time_Total = 0;
 
-    // Fill array
-    for (unsigned i = 0; i < elems; i++)
-        array[i] = random_string(5);
-    cout << "Before sorting: ";
-    for (unsigned i = 0; i < elems; i++) cout << array[i] << "|";
-    cout << endl;
+    // Qsort
+    for(unsigned i = 0; i < trials; i++)
+    {
+        cout << "Trial " << i+1 << " started.\n";
+        for (unsigned i = 0; i < elems; i++)
+            array[i] = rand() % 100;
 
-    // Sort
-    Quicksort2(array, (size_t)elems, (size_t) sizeof(ItemType), *item_cmp);
+        double TimeInit = TIME();
+        qsort(array, (size_t)elems, (size_t) sizeof(ItemType), *item_cmp);
+        double TimeFinal = TIME();
+        qs_Time_Total += TimeFinal - TimeInit;
+        cout << "Trial " << i+1 << " completed.\n";
+    }
+    qs_Time_Total = qs_Time_Total/trials;
+    cout << "Qsort completed. Average time: " << qs_Time_Total << "ms.\n\n";
 
-    // Print Sorted Array
-    cout << "After sorting: \n";
-    for (unsigned i = 0; i < elems; i++) cout << array[i] << endl;
-    cout << endl;
+    // Custom Quicksort
+    for (unsigned i = 0; i < trials; i++)
+    {
+        cout << "Trial " << i+1 << " started.\n";
+        for (unsigned i = 0; i < elems; i++)
+            array[i] = rand() % 100;
 
+        TimeInit = TIME();
+        Quicksort2(array, (size_t)elems, (size_t) sizeof(ItemType), *item_cmp);
+        TimeFinal = TIME();
+        custom_qs_Time_Total += TimeFinal - TimeInit;
+        cout << "Trial " << i+1 << " completed.\n";
+    }
+    custom_qs_Time_Total = custom_qs_Time_Total/trials;
+    cout << "Custom Quicksort completed. Average time: " << custom_qs_Time_Total << "ms.\n\n";
+
+    // Results
+    cout << "Custom is " << custom_qs_Time_Total/qs_Time_Total << " times slower." << endl;
     return 0;
 }
 
@@ -63,13 +87,29 @@ int item_cmp(const void* i1, const void* i2)
     else return 0;
 }
 
+double TIME ( void )
+{
+    struct timeb t;
+    ftime(&t);
+    return ( ( (1000.0 * t.time) + t.millitm ) );
+}
+
+// Generates random doubles.
 double fRand(double fMin, double fMax)
 {
     double f = (double)rand() / RAND_MAX;
     return fMin + f * (fMax - fMin);
 }
 
-std::string random_string( size_t length )
+// Generates random integers.
+double iRand(int fMin, int fMax)
+{
+    int f = (int)rand() / RAND_MAX;
+    return fMin + f * (fMax - fMin);
+}
+
+// Generates random strings.
+string random_string( size_t length )
 {
     char alphanum[] =
     "abcdefghijklmnopqrstuvwxyz";
@@ -82,6 +122,7 @@ std::string random_string( size_t length )
     }
     return Str;
 }
+
 
 /*
 #define item int
