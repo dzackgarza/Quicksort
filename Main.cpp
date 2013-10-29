@@ -12,7 +12,7 @@
 #include <time.h>
 #include <sys/timeb.h>
 
-#define elems 10000
+#define elems 50000
 #define trials 10
 using namespace std;
 
@@ -33,10 +33,13 @@ string random_string( size_t length );
 double iRand(int fMin, int fMax);
 double TIME();
 static ItemType array[elems];
+void call_new_test();
 //  -----------------------------------------------------
 
 int main()
 {
+    //call_new_test();
+    //return 0;
     srand (time(NULL));
     double TimeInit, TimeFinal, qs_Time_Total = 0, custom_qs_Time_Total = 0;
 
@@ -123,7 +126,20 @@ string random_string( size_t length )
     return Str;
 }
 
+void call_new_test()
+{
+    string a[100];
+    for(unsigned i = 0; i < 100; i++)
+        a[i] = random_string(5);
+    for (unsigned i = 0; i < 100; i++)
+        cout << "String " << i << ": " << a[i] << endl;
 
+    Quicksort2(a, (size_t) 100, (size_t) sizeof(string), *item_cmp);
+    cout << "Sorted." << endl;
+    for (unsigned i = 0; i < 100; i++)
+        cout << "String " << i << ": " << a[i] << endl;
+    cout << endl;
+}
 /*
 #define item int
 void test_ooo()

@@ -140,7 +140,7 @@ static void SwapItem(void* &item_1, void* &item_2, size_t width)
     char* i2 = static_cast<char*>(item_2);
 
     // Walk through i bytes (the size of the item) and swap memory contents.
-    for (unsigned i=0; i < width - 1; i++)
+    for (unsigned i=0; i < width ; i++)
     {
      char temp = i1[i];
      i1[i] = i2[i];
